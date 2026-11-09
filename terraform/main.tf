@@ -1,3 +1,7 @@
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 resource "aws_vpc" "main" {
   cidr_block       = var.cidr_block
   instance_tenancy = "default"
@@ -21,11 +25,35 @@ resource "aws_internet_gateway" "relx-gateway" {
 resource "aws_subnet" "relx-publicsubnet" {
   vpc_id     = aws_vpc.main.id
   cidr_block = var.subnet-cidr
+  availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
     Name = "${var.project-name}-${var.environment}-pubsubnet"
   }
 }
+
+resource "aws_subnet" "relx-publicsubnet_2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.3.0/24"
+  availability_zone       = data.aws_availability_zones.available.names[1]
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.project-name}-${var.environment}-pubsubnet2"
+  }
+}
+
+resource "aws_subnet" "relx-publicsubnet_3" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.4.0/24"
+  availability_zone       = "us-east-1c"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.project-name}-${var.environment}-pubsubnet3"
+  }
+}
+
 
 resource "aws_subnet" "relx-privatesubnet" {
   vpc_id     = aws_vpc.main.id
@@ -50,6 +78,14 @@ resource "aws_route_table" "relx-publicroute" {
 
 resource "aws_route_table_association" "pub-association" {
   subnet_id = aws_subnet.relx-publicsubnet.id
+  route_table_id = aws_route_table.relx-publicroute.id
+}
+resource "aws_route_table_association" "public-association-2" {
+  subnet_id      = aws_subnet.relx-publicsubnet_2.id
+  route_table_id = aws_route_table.relx-publicroute.id
+}
+resource "aws_route_table_association" "public-association-3" {
+  subnet_id      = aws_subnet.relx-publicsubnet_3.id
   route_table_id = aws_route_table.relx-publicroute.id
 }
 
@@ -79,6 +115,13 @@ resource "aws_nat_gateway" "relx-natgw" {
     allocation_id = aws_eip.relx-eip[0].id
     subnet_id = aws_subnet.relx-publicsubnet.id
     depends_on = [aws_internet_gateway.relx-gateway] 
+}
+
+resource "aws_route" "private_default" {
+     count = 1
+    route_table_id = aws_route_table.relx-privateroute.id
+    destination_cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.relx-natgw.id
 }
 
 #NETWORKING COMPONENTS
@@ -149,7 +192,3 @@ resource "aws_security_group" "web" {
     cidr_blocks = ["0.0.0.0/0"] 
   }
 }
-
-
-
-

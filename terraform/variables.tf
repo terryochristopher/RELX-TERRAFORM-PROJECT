@@ -30,11 +30,32 @@ variable "privatesubnet-cidr" {
 
 variable "admin_cidr" {
   type        = string
-  description = "Your public IPv4 address with /32 suffix, for example 203.0.113.4/32"
+  description = "Your public IPv4 address with /32 suffix"
 
   validation {
     condition = can(cidrhost(var.admin_cidr, 0)) && can(regex("/32$", var.admin_cidr))
 
     error_message = "Provide a valid IPv4 /32 admin CIDR."
   }
+}
+
+variable "ssh_public_key" { 
+    type = string
+    description = "SSH public key"
+    sensitive = true 
+}
+variable "instance_type" {
+    type = string
+    default = "t3.micro"
+    description = "size and type of instance"
+}
+
+variable "aws_region" {
+    type = string
+    description = "(optional) describe your variable"
+}
+
+variable "alert_email" { 
+    type = string
+    description = "Email to subscribe to SNS alerts" 
 }

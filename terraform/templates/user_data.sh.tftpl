@@ -1,0 +1,43 @@
+#!/bin/bash
+set -euxo pipefail
+# AL2 ships with Python 3 and yum. NAT enables yum/AWS API access.
+yum install -y amazon-cloudwatch-agent
+mkdir -p /opt/sre-app
+cat > /opt/sre-app/index.html <<'HTML'
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>SRE Exercise</title></head><body><h1>Hello, World!</h1></body></html>
+HTML
+cat > /etc/systemd/system/sre-web.service <<'UNIT'
+[Unit]
+Description=Minimal Python HTTP server for SRE assessment
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=simple
+User=nobody
+WorkingDirectory=/opt/sre-app
+ExecStart=/usr/bin/python3 -m http.server 80 --bind 0.0.0.0
+Restart=always
+RestartSec=3
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+[Install]
+WantedBy=multi-user.target
+UNIT
+systemctl daemon-reload
+systemctl enable --now sre-web
+# Retrieve ASG name from instance tags without requiring DescribeTags IAM permissions:
+# ASG name provided through Terraform tag is queried via local EC2 instance metadata?
+# Instead emit memory by AutoScalingGroupName via cloudwatch-agent append_dimensions.
+cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<'JSON'
+{
+  "agent": {"metrics_collection_interval": 60},
+  "metrics": {
+    "namespace": "SREExercise/Web",
+    "append_dimensions": {"AutoScalingGroupName": "$${aws:AutoScalingGroupName}"},
+    "aggregation_dimensions": [["AutoScalingGroupName"]],
+    "metrics_collected": {"mem": {"measurement": ["mem_used_percent"], "metrics_collection_interval": 60}}
+  }
+}
+JSON
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
