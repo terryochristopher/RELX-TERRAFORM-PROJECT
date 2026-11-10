@@ -1,31 +1,31 @@
 variable "cidr_block" {
-    type = string
-    default = "10.0.0.0/16"
-    description = "vpc cidr block"
+  type        = string
+  default     = "10.0.0.0/16"
+  description = "vpc cidr block"
 }
 
 variable "project-name" {
-    type = string
-    default = "relx"
-    description = "relx project"
+  type        = string
+  default     = "relx"
+  description = "relx project"
 }
 
 variable "environment" {
-    type = string
-    default = "dev"
-    description = "current environment"
+  type        = string
+  default     = "dev"
+  description = "current environment"
 }
 
 variable "subnet-cidr" {
-    type = string
-    default = "10.0.1.0/24"
-    description = "cidr range of subnet"
+  type        = string
+  default     = "10.0.1.0/24"
+  description = "cidr range of subnet"
 }
 
 variable "privatesubnet-cidr" {
-    type = string
-    default = "10.0.2.0/24"
-    description = "cidr range of subnet"
+  type        = string
+  default     = "10.0.2.0/24"
+  description = "cidr range of subnet"
 }
 
 variable "admin_cidr" {
@@ -39,23 +39,23 @@ variable "admin_cidr" {
   }
 }
 
-variable "ssh_public_key" { 
-    type = string
-    description = "SSH public key"
-    sensitive = true 
+variable "ssh_public_key" {
+  type        = string
+  description = "SSH public key"
+  sensitive   = true
 }
 variable "instance_type" {
-    type = string
-    default = "t3.micro"
-    description = "size and type of instance"
+  type        = string
+  default     = "t3.micro"
+  description = "size and type of instance"
 }
 
 variable "aws_region" {
-    type = string
-    description = "(optional) describe your variable"
+  type        = string
+  description = "(optional) describe your variable"
 }
 
-variable "alert_email" { 
-    type = string
-    description = "Email to subscribe to SNS alerts" 
+variable "alert_email" {
+  type        = string
+  description = "Email to subscribe to SNS alerts"
 }
