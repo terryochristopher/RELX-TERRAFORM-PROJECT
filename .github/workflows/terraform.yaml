@@ -24,6 +24,10 @@ concurrency:
   group: terraform-pointclickcare
   cancel-in-progress: false
 
+defaults:
+  run:
+    working-directory: ./terraform
+
 env:
   TF_IN_AUTOMATION: "true"
   TF_INPUT: "false"
