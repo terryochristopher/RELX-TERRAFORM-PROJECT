@@ -134,11 +134,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ALB_DNS="$(terraform output -raw alb_dns_name)"
+          ALB_URL="$(terraform output -raw alb_url)"
 
           for attempt in {1..30}; do
             if curl --fail --silent --show-error --max-time 10 \
-              "http://${ALB_DNS}/" | grep -q 'Hello, World!'; then
+              "${ALB_URL}/" | grep -q 'Hello, World!'; then
               echo "Smoke test passed"
               exit 0
             fi
