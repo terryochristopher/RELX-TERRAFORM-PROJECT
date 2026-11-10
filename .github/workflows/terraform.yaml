@@ -31,8 +31,8 @@ defaults:
 env:
   TF_IN_AUTOMATION: "true"
   TF_INPUT: "false"
-  TF_VAR_admin_cidr: ${{ vars.ADMIN_CIDR }}
-  TF_VAR_ssh_public_key: ${{ vars.SSH_PUBLIC_KEY }}
+  TF_VAR_admin_cidr: ${{ secrets.ADMIN_CIDR }}
+  TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
   TF_VAR_alert_email: ${{ vars.ALERT_EMAIL }}
   AWS_REGION: ${{ vars.AWS_REGION }}
 
