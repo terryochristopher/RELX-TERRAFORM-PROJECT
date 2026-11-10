@@ -101,7 +101,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.action == 'apply'
     needs: plan
     runs-on: ubuntu-latest
-    environment: production
+    environment: development
 
     steps:
       - uses: actions/checkout@v4
@@ -155,7 +155,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.action == 'destroy'
     needs: validate
     runs-on: ubuntu-latest
-    environment: production
+    environment: development
 
     steps:
       - uses: actions/checkout@v4
